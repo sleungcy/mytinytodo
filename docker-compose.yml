@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mytinytodo:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - MTT_DB_TYPE=postgres
+      - MTT_DB_HOST=postgres
+      - MTT_DB_NAME=mytinytodo
+      - MTT_DB_USER=mtt
+      - MTT_DB_PASSWORD=password123
+      - MTT_DB_PREFIX=mtt_
+    # Uncomment the following line to use environment file
+    # env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=mytinytodo
+      - POSTGRES_USER=mtt
+      - POSTGRES_PASSWORD=password123
+    # Uncomment the following line to use environment file
+    # env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Expose PostgreSQL port for external access if needed
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mtt -d mytinytodo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

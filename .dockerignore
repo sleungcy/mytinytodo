@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Development files
+.vscode/
+.idea/
+*.log
+
+# Composer development dependencies (handled by composer install --no-dev)
+vendor/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Build artifacts
+buildtar.php
+composer.sh
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Configuration files are explicitly needed for the build
+# nginx.conf - NEEDED
+# supervisord.conf - NEEDED
+# env.example - not needed in container

@@ -1,0 +1,23 @@
+apiVersion: v2
+name: mytinytodo
+description: A Helm chart for myTinyTodo - A tiny, self-hosted todo application
+type: application
+version: 0.1.0
+appVersion: "1.8"
+home: https://mytinytodo.net
+sources:
+  - https://github.com/sleungcy/mytinytodo
+keywords:
+  - todo
+  - productivity
+  - php
+  - nginx
+  - postgresql
+maintainers:
+  - name: mytinytodo
+    email: maxpozdeev@gmail.com
+dependencies:
+  - name: postgresql
+    version: "12.12.10"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled

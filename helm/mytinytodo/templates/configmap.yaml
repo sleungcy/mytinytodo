@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mytinytodo.fullname" . }}-config
+  labels:
+    {{- include "mytinytodo.labels" . | nindent 4 }}
+data:
+  MTT_DB_TYPE: "postgres"
+  MTT_DB_HOST: {{ include "mytinytodo.postgresql.host" . | quote }}
+  MTT_DB_PORT: {{ include "mytinytodo.postgresql.port" . | quote }}
+  MTT_DB_NAME: {{ include "mytinytodo.postgresql.database" . | quote }}
+  MTT_DB_USER: {{ include "mytinytodo.postgresql.username" . | quote }}
+  MTT_DB_PREFIX: {{ .Values.config.database.prefix | quote }}
+  {{- if .Values.config.app.debug }}
+  MTT_ENABLE_DEBUG: "YES"
+  {{- end }}
+  {{- if .Values.config.app.disableExtensions }}
+  MTT_DISABLE_EXT: "1"
+  {{- end }}
+  {{- if .Values.config.app.apiUsePathInfo }}
+  MTT_API_USE_PATH_INFO: "1"
+  {{- end }}
