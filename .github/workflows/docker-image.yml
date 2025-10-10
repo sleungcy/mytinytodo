@@ -1,0 +1,22 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build Docker Image and Push to GHCR, Docker Hub, or AWS ECR
+      uses: GlueOps/github-actions-build-push-containers@v0.4.1
+      with:
+        # Comma-separate list of tags for built image.  Defaults to GlueOps tags
+        tags: latest 
+              
