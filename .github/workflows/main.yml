@@ -1,0 +1,20 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * 1 # every monday
+  workflow_dispatch: # on button click
+
+jobs:
+  sync:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: tgymnich/fork-sync@v2
+        with:
+          owner: sleungcy
+          repo: mytinytodo
+          base: master
+          head: main
+          merge_method: merge
