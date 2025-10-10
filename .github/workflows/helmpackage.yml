@@ -1,0 +1,24 @@
+name: helm package
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Package Helm to GHCR
+      uses: camposdelima/package-helm-ghcr-action@v1.0.2
+      with:
+        # Github token to authenticate to Repo
+        gh-token: ${{ github.token }}
+        gh-repo-owner: # optional, default is ${{ github.repository_owner }}
+        chart-path: helm/mytinytodo
+              
