@@ -1,0 +1,8 @@
+name: Call External Workflow
+
+on:
+  pull_request:
+
+jobs:
+  call-external-workflow:
+    uses: sleungcy/workflow/.github/workflows/example.yaml@main
