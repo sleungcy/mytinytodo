@@ -1,10 +1,10 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types: [created]
+  # Optional: Keep manual trigger for testing
+  workflow_dispatch:
 
 jobs:
 
@@ -14,9 +14,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Extract version from release
+      id: extract_version
+      run: |
+        if [ "${{ github.event.release.tag_name }}" != "" ]; then
+          # Remove 'v' prefix if present (e.g., v1.0.0 -> 1.0.0)
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=latest" >> $GITHUB_OUTPUT
+          echo "tag=latest" >> $GITHUB_OUTPUT
+        fi
+    
     - name: Build Docker Image and Push to GHCR, Docker Hub, or AWS ECR
       uses: GlueOps/github-actions-build-push-containers@v0.4.1
       with:
-        # Comma-separate list of tags for built image.  Defaults to GlueOps tags
-        tags: latest 
+        # Use version from GitHub release tag
+        tags: ${{ steps.extract_version.outputs.version }},latest 
               

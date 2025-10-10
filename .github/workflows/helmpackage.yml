@@ -1,10 +1,10 @@
 name: helm package
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types: [created]
+  # Optional: Keep manual trigger for testing
+  workflow_dispatch:
 
 jobs:
 
@@ -13,11 +13,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Package Helm to GHCR
-      uses: camposdelima/package-helm-ghcr-action@v1.0.2
-      with:
-        # Github token to authenticate to Repo
-        gh-token: ${{ github.token }}
-        chart-path: helm/mytinytodo
-              
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: install helm
+        uses: Azure/setup-helm@v1
+
+      - name: login to ghcr using helm
+        shell: bash    
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.GCR_IMAGE }} --username ${{ github.repository_owner }} --password-stdin
+        env:
+          HELM_EXPERIMENTAL_OCI: "1"
+          GCR_IMAGE: ghcr.io/${{ github.repository_owner }}
+
+      - name: Install PyBump
+        run: |
+          python3 -m pip install pybump
+        shell: bash
+        
+      - name: Extract version from release
+        id: extract_version
+        run: |
+          if [ "${{ github.event.release.tag_name }}" != "" ]; then
+            # Remove 'v' prefix if present (e.g., v1.0.0 -> 1.0.0)
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION=${VERSION#v}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            # Fallback to chart version if no release tag
+            version=$(pybump get --file ./helm/mytinytodo/Chart.yaml)
+            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Helm Chart
+        env:
+          GCR_IMAGE: ghcr.io/${{ github.repository_owner }}
+          HELM_EXPERIMENTAL_OCI: "1"
+        run : |
+          set -x
+          version=${{ steps.extract_version.outputs.version }}
+          helm package \
+          ./helm/mytinytodo \
+          --app-version $version \
+          --version $version        
+          ls *.tgz | xargs -i helm push {} oci://$GCR_IMAGE
+        shell: bash
