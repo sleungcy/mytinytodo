@@ -57,5 +57,5 @@ jobs:
           ./helm/mytinytodo \
           --app-version $version \
           --version $version        
-          ls *.tgz | xargs -i helm push {} oci://$GCR_IMAGE
+          ls mytinytodo-chart-*.tgz | xargs -I {} helm push {} oci://$GCR_IMAGE
         shell: bash
