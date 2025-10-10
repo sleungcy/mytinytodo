@@ -13,8 +13,8 @@ jobs:
     steps:
       - uses: tgymnich/fork-sync@v2
         with:
-          owner: sleungcy
-          repo: mytinytodo
-          base: main
-          head: master
+          owner: sleungcy # owner of the fork
+          repo: mytinytodo # repo name of the fork
+          base: main # branch on the fork
+          head: master # branch on the upstream
           merge_method: merge
