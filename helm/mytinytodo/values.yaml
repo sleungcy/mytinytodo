@@ -34,7 +34,31 @@ securityContext:
 service:
   type: ClusterIP
   port: 80
-  targetPort: 80
+  targetPort: 8080
+
+# Nginx configuration
+nginx:
+  image:
+    repository: nginx
+    tag: "1.24-alpine"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# PHP-FPM configuration
+phpfpm:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
 
 ingress:
   enabled: false

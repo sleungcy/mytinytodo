@@ -2,7 +2,7 @@
 set -e
 
 # Start PHP-FPM in background
-php-fpm --daemonize
+php-fpm;
 
 # Start Nginx in foreground (keeps container running)
-exec nginx -g 'daemon off;'
+# exec nginx -g 'daemon off;'

@@ -58,16 +58,28 @@ spec:
                   name: {{ include "mytinytodo.postgresql.secretName" . }}
                   key: {{ include "mytinytodo.postgresql.secretKey" . }}
       containers:
-        - name: {{ .Chart.Name }}
+        # PHP-FPM container
+        - name: php-fpm
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: php-fpm
+              containerPort: 9000
               protocol: TCP
           env:
+            - name: MTT_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mytinytodo.postgresql.secretName" . }}
+                  key: POSTGRES_USER
+
+            - name: MTT_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mytinytodo.postgresql.secretName" . }}
+                  key: POSTGRES_DB
             - name: MTT_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -81,6 +93,40 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "mytinytodo.fullname" . }}-config
+          {{- if .Values.healthcheck.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: {{ .Values.healthcheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthcheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthcheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthcheck.failureThreshold }}
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: {{ .Values.healthcheck.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthcheck.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthcheck.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthcheck.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.phpfpm.resources | nindent 12 }}
+          volumeMounts:
+            - name: app-storage
+              mountPath: /var/www/html
+            {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: /var/www/html/src/db
+            {{- end }}
+
+        # Nginx container
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
           {{- if .Values.healthcheck.enabled }}
           livenessProbe:
             httpGet:
@@ -100,18 +146,37 @@ spec:
             failureThreshold: {{ .Values.healthcheck.failureThreshold }}
           {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.persistence.enabled }}
+            {{- toYaml .Values.nginx.resources | nindent 12 }}
           volumeMounts:
-            - name: data
-              mountPath: /var/www/html/src/db
-          {{- end }}
-      {{- if .Values.persistence.enabled }}
+            - name: app-storage
+              mountPath: /var/www/html
+              readOnly: true
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+
+      # Shared volumes
       volumes:
+        - name: app-storage
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: {{ include "mytinytodo.fullname" . }}-nginx-config
+        {{- if .Values.persistence.enabled }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ include "mytinytodo.fullname" . }}-data
-      {{- end }}
+        {{- end }}
+
+      # Init container to copy app files to shared volume
+      initContainers:
+        - name: copy-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ['sh', '-c', 'cp -r /var/www/html/* /shared/']
+          volumeMounts:
+            - name: app-storage
+              mountPath: /shared
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
