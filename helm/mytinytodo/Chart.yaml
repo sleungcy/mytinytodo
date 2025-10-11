@@ -2,7 +2,7 @@ apiVersion: v2
 name: mytinytodo-chart
 description: A Helm chart for myTinyTodo - A tiny, self-hosted todo application
 type: application
-version: 0.1.0
+version: 0.0.1
 appVersion: "1.8"
 home: https://mytinytodo.net
 sources:

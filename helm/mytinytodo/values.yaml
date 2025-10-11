@@ -94,7 +94,7 @@ config:
 
 # PostgreSQL configuration (using Bitnami PostgreSQL chart)
 postgresql:
-  enabled: true
+  enabled: false
   auth:
     postgresPassword: ""  # Will be generated if empty
     username: mytinytodo
