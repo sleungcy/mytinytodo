@@ -13,8 +13,8 @@ A Helm chart for deploying myTinyTodo, a tiny self-hosted todo application, on K
 To install the chart with the release name `my-mytinytodo`:
 
 ```bash
-# Add the Bitnami repository (for PostgreSQL dependency)
-helm repo add bitnami https://charts.bitnami.com/bitnami
+# Add the Leverages repository (for PostgreSQL dependency)
+helm repo add leverages https://leverages.github.io/helm
 helm repo update
 
 # Install the chart
@@ -116,12 +116,15 @@ This command removes all the Kubernetes components associated with the chart and
 | Name                                          | Description                                        | Value        |
 | --------------------------------------------- | -------------------------------------------------- | ------------ |
 | `postgresql.enabled`                          | Switch to enable or disable the PostgreSQL helm chart | `true`   |
-| `postgresql.auth.postgresPassword`           | Password for the "postgres" admin user            | `""`         |
-| `postgresql.auth.username`                   | Name for a custom user to create                  | `mytinytodo` |
-| `postgresql.auth.password`                   | Password for the custom user to create            | `""`         |
-| `postgresql.auth.database`                   | Name for a custom database to create              | `mytinytodo` |
-| `postgresql.primary.persistence.enabled`     | Enable PostgreSQL Primary data persistence using PVC | `true`    |
-| `postgresql.primary.persistence.size`        | PVC Storage Request for PostgreSQL volume         | `8Gi`        |
+| `postgresql.postgres.username`               | Name for a custom user to create                  | `mytinytodo` |
+| `postgresql.postgres.password`               | Password for the custom user to create            | `""`         |
+| `postgresql.postgres.database`               | Name for a custom database to create              | `mytinytodo` |
+| `postgresql.persistence.enabled`             | Enable PostgreSQL data persistence using PVC      | `true`       |
+| `postgresql.persistence.size`                | PVC Storage Request for PostgreSQL volume         | `8Gi`        |
+| `postgresql.resources.requests.memory`       | Memory request for PostgreSQL                     | `256Mi`      |
+| `postgresql.resources.requests.cpu`          | CPU request for PostgreSQL                        | `250m`       |
+| `postgresql.resources.limits.memory`         | Memory limit for PostgreSQL                       | `512Mi`      |
+| `postgresql.resources.limits.cpu`            | CPU limit for PostgreSQL                          | `500m`       |
 
 ### External Database parameters
 
@@ -165,7 +168,7 @@ ingress:
           pathType: Prefix
 
 postgresql:
-  auth:
+  postgres:
     password: "my-secure-password"
 
 resources:

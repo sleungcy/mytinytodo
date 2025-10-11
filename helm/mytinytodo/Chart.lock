@@ -1,6 +1,6 @@
 dependencies:
 - name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 12.12.10
-digest: sha256:4ecfc1482bfb75529b0fda44b37bda7dd39f178990c1fc348eb18d9ca352e1df
-generated: "2025-10-10T11:16:38.681058-07:00"
+  repository: https://leverages.github.io/helm
+  version: 0.1.2
+digest: sha256:557c6f838fd58285e67f88e2f9e943c001635eb1bfef42686a1df28163fe5b94
+generated: "2025-10-11T10:01:29.371074-07:00"

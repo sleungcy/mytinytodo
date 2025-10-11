@@ -92,27 +92,115 @@ config:
     disableExtensions: false
     apiUsePathInfo: false
 
-# PostgreSQL configuration (using Bitnami PostgreSQL chart)
+# PostgreSQL configuration (using Leverages PostgreSQL chart)
 postgresql:
-  enabled: false
-  auth:
-    postgresPassword: ""  # Will be generated if empty
-    username: mytinytodo
-    password: ""  # Will be generated if empty
-    database: mytinytodo
-  primary:
-    persistence:
-      enabled: true
-      size: 8Gi
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 250m
-      limits:
-        memory: 512Mi
-        cpu: 500m
-  metrics:
-    enabled: false
+  enabled: true
+
+  postgresql: {}
+  #   # Official PostgreSQL Docker image
+  #   image:
+  #     repository: postgres
+  #     tag: "16"
+  #     pullPolicy: IfNotPresent
+    
+  #   # Database credentials
+  #   auth:
+  #     # PostgreSQL super user
+  #     username: postgres
+  #     # Use existing secret or create new one
+  #     existingSecret: ""
+  #     # Password for PostgreSQL super user (ignored if existingSecret is provided)
+  #     password: "changeme"
+  #     # Name of database to create
+  #     database: "postgres"
+
+  #   # PostgreSQL configuration parameters
+  #   config:
+  #     # PostgreSQL port
+  #     port: 5432
+  #     # Max connections
+  #     maxConnections: 100
+  #     # Shared buffers
+  #     sharedBuffers: "128MB"
+  #     # Effective cache size
+  #     effectiveCacheSize: "256MB"
+
+  # # Local deployment configuration (StatefulSet)
+  # local:
+  #   # Number of replicas
+  #   replicaCount: 1
+    
+  #   # Resource limits and requests
+  #   resources:
+  #     limits:
+  #       cpu: 500m
+  #       memory: 512Mi
+  #     requests:
+  #       cpu: 250m
+  #       memory: 256Mi
+    
+  #   # Storage configuration for local deployment
+  #   persistence:
+  #     enabled: true
+  #     size: 8Gi
+  #     storageClass: ""
+  #     accessMode: ReadWriteOnce
+
+  #   # Service configuration for local deployment
+  #   service:
+  #     type: ClusterIP
+  #     port: 5432
+
+  # # Cloud deployment configuration (Deployment with PV/PVC)
+  # cloud:
+  #   # Number of replicas
+  #   replicaCount: 1
+    
+  #   # Resource limits and requests
+  #   resources:
+  #     limits:
+  #       cpu: 1000m
+  #       memory: 1Gi
+  #     requests:
+  #       cpu: 500m
+  #       memory: 512Mi
+    
+  #   # Persistent Volume configuration
+  #   persistence:
+  #     enabled: true
+  #     size: 20Gi
+  #     storageClass: ""
+  #     accessMode: ReadWriteOnce
+  #     # Persistent Volume configuration
+  #     persistentVolume:
+  #       enabled: true
+  #       capacity: 20Gi
+  #       accessMode: ReadWriteOnce
+  #       storageClass: ""
+  #       hostPath: ""  # For hostPath type PV
+        
+  #   # Service configuration for cloud deployment
+  #   service:
+  #     type: LoadBalancer
+  #     port: 5432
+  #     # LoadBalancer specific configuration
+  #     loadBalancerIP: ""
+  #     loadBalancerSourceRanges: []
+
+  # # Security context
+  # securityContext:
+  #   runAsUser: 999
+  #   runAsGroup: 999
+  #   fsGroup: 999
+
+  # # Node selector
+  # nodeSelector: {}
+
+  # # Tolerations
+  # tolerations: []
+
+  # # Affinity
+  # affinity: {}
 
 # External PostgreSQL configuration (when postgresql.enabled = false)
 externalDatabase:

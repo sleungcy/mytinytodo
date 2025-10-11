@@ -66,7 +66,7 @@ Create PostgreSQL host
 */}}
 {{- define "mytinytodo.postgresql.host" -}}
 {{- if .Values.postgresql.enabled -}}
-{{- printf "%s-postgresql" (include "mytinytodo.fullname" .) -}}
+{{- printf "%s-postgresql" $.Release.Name -}}
 {{- else -}}
 {{- .Values.externalDatabase.host -}}
 {{- end -}}
@@ -88,7 +88,7 @@ Create PostgreSQL database name
 */}}
 {{- define "mytinytodo.postgresql.database" -}}
 {{- if .Values.postgresql.enabled -}}
-{{- .Values.postgresql.auth.database -}}
+{{- .Values.postgresql.postgresql.database -}}
 {{- else -}}
 {{- .Values.externalDatabase.database -}}
 {{- end -}}
@@ -99,7 +99,7 @@ Create PostgreSQL username
 */}}
 {{- define "mytinytodo.postgresql.username" -}}
 {{- if .Values.postgresql.enabled -}}
-{{- .Values.postgresql.auth.username -}}
+{{- .Values.postgresql.postgresql.username -}}
 {{- else -}}
 {{- .Values.externalDatabase.username -}}
 {{- end -}}
@@ -110,7 +110,7 @@ Create PostgreSQL secret name
 */}}
 {{- define "mytinytodo.postgresql.secretName" -}}
 {{- if .Values.postgresql.enabled -}}
-{{- printf "%s-postgresql" (include "mytinytodo.fullname" .) -}}
+{{- printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}-secret
 {{- else -}}
 {{- if .Values.externalDatabase.existingSecret -}}
 {{- .Values.externalDatabase.existingSecret -}}
@@ -125,12 +125,12 @@ Create PostgreSQL secret key
 */}}
 {{- define "mytinytodo.postgresql.secretKey" -}}
 {{- if .Values.postgresql.enabled -}}
-postgres-password
+POSTGRES_PASSWORD
 {{- else -}}
 {{- if .Values.externalDatabase.existingSecret -}}
 {{- .Values.externalDatabase.existingSecretPasswordKey -}}
 {{- else -}}
-postgresql-password
+POSTGRES_PASSWORD
 {{- end -}}
 {{- end -}}
 {{- end -}}

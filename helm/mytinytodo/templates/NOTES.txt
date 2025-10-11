@@ -45,6 +45,12 @@
 WARNING: You are using an external PostgreSQL database. Make sure it is accessible and properly configured.
 {{- end }}
 
-{{- if and .Values.postgresql.enabled (not .Values.postgresql.auth.password) }}
+{{- if and .Values.postgresql.enabled (not .Values.postgresql.postgresql.auth.password) }}
 WARNING: Using default PostgreSQL password. Please set a secure password for production use.
 {{- end }}
+
+UPGRADE NOTES:
+If you encounter StatefulSet upgrade errors, use one of these approaches:
+1. Force upgrade: helm upgrade {{ .Release.Name }} ./helm/mytinytodo --force
+2. Manual cleanup: kubectl delete statefulset {{ include "mytinytodo.fullname" . }}-postgresql --cascade=orphan
+   Then: helm upgrade {{ .Release.Name }} ./helm/mytinytodo

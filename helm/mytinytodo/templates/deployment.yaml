@@ -36,13 +36,23 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h {{ include "mytinytodo.postgresql.host" . }} -p {{ include "mytinytodo.postgresql.port" . }} -U {{ include "mytinytodo.postgresql.username" . }}; do
+              until pg_isready -h {{ include "mytinytodo.postgresql.host" . }} -p {{ include "mytinytodo.postgresql.port" . }} -U $POSTGRES_USER; do
                 echo "Waiting for PostgreSQL to be ready..."
                 sleep 2
               done
               echo "PostgreSQL is ready!"
           env:
             - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mytinytodo.postgresql.secretName" . }}
+                  key: {{ include "mytinytodo.postgresql.secretKey" . }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mytinytodo.postgresql.secretName" . }}
+                  key: {{ include "mytinytodo.postgresql.secretKey" . }}
+            - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
                   name: {{ include "mytinytodo.postgresql.secretName" . }}
