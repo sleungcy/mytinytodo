@@ -46,18 +46,31 @@ RUN cp src/docker-config.php src/config.php
 RUN mkdir -p src/db \
     && mkdir -p /var/run/nginx \
     && mkdir -p /var/log/nginx \
+    && mkdir -p /var/lib/nginx/body \
+    && mkdir -p /var/lib/nginx/fastcgi \
+    && mkdir -p /var/lib/nginx/proxy \
+    && mkdir -p /var/lib/nginx/scgi \
+    && mkdir -p /var/lib/nginx/uwsgi \
+    && mkdir -p /tmp/nginx/client_body \
+    && mkdir -p /tmp/nginx/proxy \
+    && mkdir -p /tmp/nginx/fastcgi \
+    && mkdir -p /tmp/nginx/uwsgi \
+    && mkdir -p /tmp/nginx/scgi \
     && chmod 755 src/db \
     && chown -R www-data:www-data /var/www/html \
+    && chown -R www-data:www-data /var/run/nginx \
+    && chown -R www-data:www-data /var/log/nginx \
+    && chown -R www-data:www-data /var/lib/nginx \
+    && chown -R www-data:www-data /tmp/nginx \
     && chmod -R 644 /var/www/html \
     && find /var/www/html -type d -exec chmod 755 {} \;
 
 # Configure Nginx
 RUN rm /etc/nginx/sites-enabled/default
-COPY nginx.conf /etc/nginx/sites-available/mytinytodo
-RUN ln -s /etc/nginx/sites-available/mytinytodo /etc/nginx/sites-enabled/
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Set proper permissions for configuration files
-RUN chmod 644 /etc/nginx/sites-available/mytinytodo
+RUN chmod 644 /etc/nginx/nginx.conf
 
 # Configure PHP-FPM
 RUN echo "clear_env = no" >> /usr/local/etc/php-fpm.d/www.conf
