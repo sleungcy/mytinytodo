@@ -57,6 +57,12 @@ spec:
                 secretKeyRef:
                   name: {{ include "mytinytodo.postgresql.secretName" . }}
                   key: {{ include "mytinytodo.postgresql.secretKey" . }}
+        - name: copy-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ['sh', '-c', 'cp -r /var/www/html/* /shared/']
+          volumeMounts:
+            - name: app-storage
+              mountPath: /shared
       containers:
         # PHP-FPM container
         - name: php-fpm
@@ -169,14 +175,6 @@ spec:
             claimName: {{ include "mytinytodo.fullname" . }}-data
         {{- end }}
 
-      # Init container to copy app files to shared volume
-      initContainers:
-        - name: copy-app
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          command: ['sh', '-c', 'cp -r /var/www/html/* /shared/']
-          volumeMounts:
-            - name: app-storage
-              mountPath: /shared
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
