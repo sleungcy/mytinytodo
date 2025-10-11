@@ -31,13 +31,13 @@ securityContext:
   readOnlyRootFilesystem: false
   allowPrivilegeEscalation: false
 
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 8080
-
 # Nginx configuration
 nginx:
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
   image:
     repository: nginx
     tag: "1.24-alpine"
@@ -52,6 +52,11 @@ nginx:
 
 # PHP-FPM configuration
 phpfpm:
+  service:
+    type: ClusterIP
+    port: 9000
+    targetPort: 9000
+
   resources:
     limits:
       cpu: 500m

@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -5,10 +6,26 @@ metadata:
   labels:
     {{- include "mytinytodo.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.nginx.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
+    - port: {{ .Values.nginx.service.port }}
+      targetPort: {{ .Values.nginx.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "mytinytodo.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mytinytodo.fullname" . }}-php-fpm
+  labels:
+    {{- include "mytinytodo.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.phpfpm.service.type }}
+  ports:
+    - port: {{ .Values.phpfpm.service.port }}
+      targetPort: {{ .Values.phpfpm.service.targetPort }}
       protocol: TCP
       name: http
   selector:
