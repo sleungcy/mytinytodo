@@ -41,5 +41,5 @@ docker-compose*.yml
 
 # Configuration files are explicitly needed for the build
 # nginx.conf - NEEDED
-# supervisord.conf - NEEDED
+# start.sh - NEEDED
 # env.example - not needed in container

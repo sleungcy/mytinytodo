@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     unzip \
     nginx \
-    supervisor \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,7 +44,8 @@ RUN cp src/docker-config.php src/config.php
 
 # Create necessary directories and set permissions
 RUN mkdir -p src/db \
-    && mkdir -p /var/log/supervisor \
+    && mkdir -p /var/run/nginx \
+    && mkdir -p /var/log/nginx \
     && chmod 755 src/db \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 644 /var/www/html \
@@ -53,18 +53,18 @@ RUN mkdir -p src/db \
 
 # Configure Nginx
 RUN rm /etc/nginx/sites-enabled/default
+COPY nginx.conf /etc/nginx/sites-available/mytinytodo
 RUN ln -s /etc/nginx/sites-available/mytinytodo /etc/nginx/sites-enabled/
 
-# Copy configuration files explicitly
-COPY nginx.conf /etc/nginx/sites-available/mytinytodo
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 # Set proper permissions for configuration files
-RUN chmod 644 /etc/nginx/sites-available/mytinytodo \
-    && chmod 644 /etc/supervisor/conf.d/supervisord.conf
+RUN chmod 644 /etc/nginx/sites-available/mytinytodo
 
 # Configure PHP-FPM
 RUN echo "clear_env = no" >> /usr/local/etc/php-fpm.d/www.conf
+
+# Create startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
 # Environment variables for PostgreSQL
 ENV MTT_DB_TYPE=postgres
@@ -83,5 +83,5 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
-# Start Supervisor (manages Nginx and PHP-FPM)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Start both PHP-FPM and Nginx
+CMD ["/start.sh"]
